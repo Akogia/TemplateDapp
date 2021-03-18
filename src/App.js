@@ -4,7 +4,7 @@ import './App.css'
 import Web3 from 'web3'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Navbar from 'react-bootstrap/Navbar'
-import MetaCoin from './abi/MetaCoin.json'
+import Bank from './abi/Bank.json'
 import Main from './Main'
 
 class App extends Component {
@@ -19,6 +19,7 @@ class App extends Component {
     if(window.ethereum) {
       window.web3 = new Web3(window.ethereum)
       await window.ethereum.enable()
+      console.log(window.web3)
     }
     else if (window.web3) {
       window.web3 = new Web3(window.web3.currentProvider)
@@ -42,24 +43,26 @@ class App extends Component {
 
     //Load Token balance from contract
     const networkID = await web3.eth.net.getId()
-    const tokenData = MetaCoin.networks[networkID]
+    const tokenData = Bank.networks[networkID]
     if(tokenData){
-      const MetaCoinContract = new web3.eth.Contract(MetaCoin.abi, tokenData.address)
-      console.log(MetaCoinContract)
-      this.setState({MetaCoinContract})
-      let tokenBalance = await MetaCoinContract.methods.getBalance(this.state.account).call()
-      this.setState({tokenBalance: tokenBalance.toString()})
-      console.log(tokenBalance)
+      const BankContract = new web3.eth.Contract(Bank.abi, tokenData.address)
+      console.log(BankContract)
+      this.setState({BankContract})
 
       //Load Ether balance from contract
-      let EtherBalance = await MetaCoinContract.methods.getBalanceInEth(this.state.account).call()
+      let EtherBalance = await BankContract.methods.getBalance().call()
       this.setState({EtherBalance: EtherBalance.toString()})
       console.log(EtherBalance)
     } else {
-      window.alert('MetaCoin contract not deployed to detected network')
+      window.alert('Bank contract not deployed to detected network')
     }
     this.setState({loading:false})
     
+  }
+
+  depositAmount = (etherAmount) => {
+    this.setState({loading: true})
+    this.state.BankContract.methods.deposit().send({value:etherAmount,from: this.state.account}).on('transactionHash',(hash)=>{this.setState({loading:false})})
   }
 
   constructor(props){
@@ -72,21 +75,23 @@ class App extends Component {
       ethBalance: 0,
       EtherBalance: 0,
       BankAddress: null,
-      loading: true
+      loading: true,
     }
   }
 
   render () {
     let content
     if(this.state.loading){
-        content = <p id="loader" className="text-center"><h1>Loading ...</h1></p>
+        content = <p id="loader" className="text-center">Loading ...</p>
     } 
     else {
       content = <Main 
           account={this.state.account}
           tokenBalance={this.state.tokenBalance}
           ethBalance={this.state.ethBalance}
-          EtherBalance={this.state.EtherBalance}/>
+          EtherBalance={this.state.EtherBalance}
+          deposit={this.depositAmount}
+          />
     }
 
     
