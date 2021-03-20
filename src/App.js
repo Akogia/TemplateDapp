@@ -65,6 +65,14 @@ class App extends Component {
     this.state.BankContract.methods.deposit().send({value:etherAmount,from: this.state.account}).on('transactionHash',(hash)=>{this.setState({loading:false})})
   }
 
+  transfer = (receiver,amount) => {
+    amount = window.web3.utils.fromWei(amount, 'Ether')
+    console.log("das ist ein Test")
+    console.log(receiver,amount)
+    this.setState({loading: true})
+    this.state.BankContract.methods.transfer(receiver,amount).send({value:amount,from:this.state.account}).on('transactionHash',(hash)=>{this.setState({loading:false})})
+  }
+
   constructor(props){
     super(props)
     this.state = {
@@ -91,6 +99,7 @@ class App extends Component {
           ethBalance={this.state.ethBalance}
           EtherBalance={this.state.EtherBalance}
           deposit={this.depositAmount}
+          transfer={this.transfer}
           />
     }
 

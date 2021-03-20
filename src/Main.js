@@ -15,18 +15,42 @@ class Main extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      output: '0'
+      receiver: '',
+      etherAmount:0,
+      amount: 0
     }
   }
 
   submitten = (event) => {
-    event.preventDefault()
-    let etherAmount
-    etherAmount = this.input.value.toString()
-    console.log(etherAmount)
-    etherAmount = window.web3.utils.toWei(etherAmount, 'Ether')
-    console.log(etherAmount)
-    this.props.deposit(etherAmount)
+    let DepoValue = this.state.etherAmount.toString()
+    DepoValue = window.web3.utils.toWei(DepoValue, 'Ether')
+    console.log(this.state.etherAmount, DepoValue)
+    this.props.deposit(DepoValue)
+  }
+
+  addReceiver = (event) => {
+    const receiver = this.state.receiver.toString()
+    console.log(receiver)
+    this.setState({receiver})
+  }
+
+  handlerChange= (event) => {
+    const target = event.target
+    const name = target.name
+    console.log(event.target.value)
+    console.log(name)
+    this.setState({[name]: event.target.value})
+    console.log(this.state.receiver)
+  }
+
+  addTransfer = (event) => {
+    console.log(this.state.amount)
+    console.log(this.state.receiver)
+    let amount = this.state.amount.toString()
+    console.log(amount)
+    amount = window.web3.utils.toWei(amount, 'Ether')
+    console.log(amount)
+    this.props.transfer(this.state.receiver, amount)
   }
 
   render () {
@@ -42,30 +66,37 @@ class Main extends Component {
   	              type="text"
   	              ref={(input) => { this.input = input }}
   	              className="form-control form-control-lg"
+                  name="etherAmount"
+                  value={this.state.etherAmount}
+                  onChange={this.handlerChange}
   	              required
               />
             </InputGroup>
 
-            <InputGroup className=" mb-3">
+            <InputGroup className="mb-3" style={{ width: '60rem', margin: 'auto' }}>
               <FormControl
                 placeholder="Recipient's address 0x"
-                aria-label="Recipient's address 0x"
-                aria-describedby="basic-addon2"
+                name="receiver"
                 type="text"
+                ref={(receiver) => { this.input = receiver }}
+                value={this.state.receiver}
+                onChange={this.handlerChange}
                 className="form-control form-control-lg"
-                disabled
               />
-              <InputGroup.Append>
-                <Button variant="outline-secondary">Add Address as Receiver</Button>
-              </InputGroup.Append>
+              <InputGroup.Prepend>
+                <Button variant="outline-secondary" onClick={this.addReceiver}>Add Address as Receiver</Button>
+              </InputGroup.Prepend>
             </InputGroup>
 
             <InputGroup className="mb-3">
               <InputGroup.Prepend>
-                <Button variant="outline-secondary">Button</Button>
-                <Button variant="outline-secondary">Button</Button>
+                <Button variant="outline-secondary" onClick={this.addTransfer}>Transfer</Button>
               </InputGroup.Prepend>
-              <FormControl aria-describedby="basic-addon1" />
+              <FormControl aria-describedby="basic-addon1" placeholder="Amount of the transfered money"
+              name="amount"
+              value={this.state.amount}
+              onChange={this.handlerChange}
+              />
             </InputGroup>
 
             <InputGroup>
@@ -106,7 +137,7 @@ class Main extends Component {
             <header className="App-header">
               <img src={logo} className="App-logo" alt="logo" />
               <p>
-                Edit <code>src/App.js</code> and save to reload.
+                Edit <code>src/App.js</code> and save to reload. 0x4C231E89A53D1c81620f1E2516d4dEEAC27F4a0C
               </p>
               <a
                 className="App-link"

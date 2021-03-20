@@ -42,7 +42,7 @@ contract Bank{
       return balance[msg.sender];
   }
   
-  function transfer(address recipient, uint amount) public {
+  function transfer(address recipient, uint amount) public payable {
       require(balance[msg.sender] >= amount, "Balance not sufficient");
       require(msg.sender != recipient, "Don't transfer money to yourself");
       
